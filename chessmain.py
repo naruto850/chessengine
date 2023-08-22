@@ -46,11 +46,11 @@ def main():
                     print(move.getchessnotation())
                     for i in range(len(validmoves)):
                         if move in validmoves[i]:
-                            gs.makmove(move)
+                            gs.makmove(validmoves[i])
                             movemade = True
                             sqselected = ()
                             playerclicks = []
-                    else:
+                    if not movemade:
                         playerclicks = [sqselected]
         if movemade:
             validmoves = gs.getvalidmoves()
