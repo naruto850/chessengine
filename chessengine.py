@@ -309,7 +309,10 @@ class move():
         self.endcol = endsq[1]
         self.peicemoved = board[self.startrow][self.startcol]
         self.peicecaptured = board[self.endrow][self.endcol]
+        self.ispawnpromotion = False
 
+        if(self.peicemoved == "wp" and self.endrow == 0) or (self.peicemoved == "bp" and self.endrow == 7):
+            self.ispawnpromotion = True
         self.moveid = self.startrow * 1000 + self.startcol * 100 + self.endrow * 10 + self.endcol
 
     def __eq__(self, other):
