@@ -44,11 +44,12 @@ def main():
                 if len(playerclicks) == 2:
                     move = chessengine.move(playerclicks[0], playerclicks[1], gs.board)
                     print(move.getchessnotation())
-                    if move in validmoves:
-                        gs.makmove(move)
-                        movemade = True
-                        sqselected = ()
-                        playerclicks = []
+                    for i in range(len(validmoves)):
+                        if move in validmoves[i]:
+                            gs.makmove(move)
+                            movemade = True
+                            sqselected = ()
+                            playerclicks = []
                     else:
                         playerclicks = [sqselected]
         if movemade:
