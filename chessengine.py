@@ -19,6 +19,7 @@ class gamestate():
         self.whitekinglocation = (7, 4)
         self.blackkinglocation = (0, 4)
         self.incheck = False
+        self.enpassentpossible = ()
         self.pins = []
         self.checks = []
 
@@ -31,6 +32,9 @@ class gamestate():
             self.whitekinglocation = (move.endrow, move.endcol)
         elif move.peicemoved == 'bK':
             self.blackkinglocation = (move.endrow, move.endcol)
+
+        if move.ispawnpromotion:
+            self.board[move.endrow][move.endcol] = move.peicemoved[0] + 'Q'
     def getvalidmoves(self):
         moves = []
         self.incheck, self.pins, self.checks = self.checkforpinsandchecks()
@@ -105,7 +109,7 @@ class gamestate():
                         moves.append(move((i, j), (i - 1, j - 1), self.board))
 
             if j + 1 <= 7:
-                if self.board[i - 1][j + 1] == "b":
+                if self.board[i - 1][j + 1][0] == "b":
                     if not piecepinned or pindirection == (-1, 1):
                         moves.append(move((i, j), (i - 1, j + 1), self.board))
         else:
@@ -310,7 +314,6 @@ class move():
         self.peicemoved = board[self.startrow][self.startcol]
         self.peicecaptured = board[self.endrow][self.endcol]
         self.ispawnpromotion = False
-
         if(self.peicemoved == "wp" and self.endrow == 0) or (self.peicemoved == "bp" and self.endrow == 7):
             self.ispawnpromotion = True
         self.moveid = self.startrow * 1000 + self.startcol * 100 + self.endrow * 10 + self.endcol

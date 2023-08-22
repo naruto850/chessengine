@@ -45,7 +45,7 @@ def main():
                     move = chessengine.move(playerclicks[0], playerclicks[1], gs.board)
                     print(move.getchessnotation())
                     for i in range(len(validmoves)):
-                        if move in validmoves[i]:
+                        if move == validmoves[i]:
                             gs.makmove(validmoves[i])
                             movemade = True
                             sqselected = ()
