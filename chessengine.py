@@ -34,8 +34,17 @@ class gamestate():
             self.blackkinglocation = (move.endrow, move.endcol)
 
         if move.ispawnpromotion:
-            self.board[move.endrow][move.endcol] = move.peicemoved[0] + 'Q'
+            self.board[move.endrow][move.endcol] = move.peicemoved[0] + input("what would you like to promtote note no spaces please UI is underway: ")
+
+        if move.isenpassent == True:
+            self.board[move.startrow][move.startcol] = '--'
+
+        if move.peicemoved[1] == 'p' and abs(move.startrow - move.startcol) == 2:
+            self.enpassentpossible = ((move.startrow + move.endrow) // 2, move.startcol)
+        else:
+            self.enpassentpossible = ()
     def getvalidmoves(self):
+        tempenpassentpossible = self.enpassentpossible
         moves = []
         self.incheck, self.pins, self.checks = self.checkforpinsandchecks()
 
@@ -71,6 +80,7 @@ class gamestate():
         else:
             moves = self.getallmoves()
 
+        self.enpassentpossible = tempenpassentpossible
         return moves
 
 
@@ -107,11 +117,14 @@ class gamestate():
                 if self.board[i - 1][j - 1][0] == "b":
                     if not piecepinned or pindirection == (-1, -1):
                         moves.append(move((i, j), (i - 1, j - 1), self.board))
-
+                    if (i-1, j-1) == self.enpassentpossible:
+                        moves.append(move((i, j), (i - 1, j - 1), self.board, enpassentposible=True))
             if j + 1 <= 7:
                 if self.board[i - 1][j + 1][0] == "b":
                     if not piecepinned or pindirection == (-1, 1):
                         moves.append(move((i, j), (i - 1, j + 1), self.board))
+                    if (i-1, j+1) == self.enpassentpossible:
+                        moves.append(move((i, j), (i - 1, j + 1), self.board, enpassentposible=True))
         else:
             if self.board[i + 1][j] == "--":
                 if not piecepinned or pindirection == (1, 0):
@@ -123,11 +136,15 @@ class gamestate():
                 if self.board[i + 1][j - 1][0] == "w":
                     if not piecepinned or pindirection == (1, -1):
                         moves.append(move((i, j), (i + 1, j - 1), self.board))
-
+                    if (i + 1, j - 1) == self.enpassentpossible:
+                        moves.append(move((i, j), (i + 1, j - 1), self.board, enpassentposible=True))
             if j + 1 <= 7:
                 if self.board[i + 1][j + 1][0] == "w":
                     if not piecepinned or pindirection == (1, 1):
                         moves.append(move((i, j), (i + 1, j + 1), self.board))
+                    if (i + 1, j + 1) == self.enpassentpossible:
+                        moves.append(move((i, j), (i + 1, j + 1), self.board, enpassentposible=True))
+
 
 
     def getrookmoves(self, i, j, moves):
@@ -306,18 +323,21 @@ class move():
     coltofiles = {v: k for k, v in filestocol.items()}
 
 
-    def __init__(self, startsq, endsq, board):
+    def __init__(self, startsq, endsq, board, enpassentposible = False):
         self.startrow = startsq[0]
         self.startcol = startsq[1]
         self.endrow = endsq[0]
         self.endcol = endsq[1]
         self.peicemoved = board[self.startrow][self.startcol]
         self.peicecaptured = board[self.endrow][self.endcol]
-        self.ispawnpromotion = False
-        if(self.peicemoved == "wp" and self.endrow == 0) or (self.peicemoved == "bp" and self.endrow == 7):
-            self.ispawnpromotion = True
+        self.ispawnpromotion = ((self.peicemoved == "wp" and self.endrow == 0) or (self.peicemoved == "bp" and self.endrow == 7))
+
+        self.isenpassent = enpassentposible
+
         self.moveid = self.startrow * 1000 + self.startcol * 100 + self.endrow * 10 + self.endcol
 
+        if self.isenpassent:
+            self.peicecaptured = "wp" if self.peicemoved == "bp" else 'bp'
     def __eq__(self, other):
         if isinstance(other, move):
             return self.moveid == other.moveid
